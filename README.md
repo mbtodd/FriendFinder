@@ -1,12 +1,11 @@
-# FriendFinder
+# Friend Finder - Node and Express Servers
 Friend Finder app. week 13 assignment
 
 
-<h2> Live Link </h2>
+## Live Link
 
 https://quiet-wave-78658.herokuapp.com/
 
-# Friend Finder - Node and Express Servers
 
 ### Overview
 
