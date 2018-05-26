@@ -1,77 +1,58 @@
-// A GET route with the url /api/friends. 
-// 	This will be used to display a JSON of all possible friends.
-// A POST routes /api/friends. 
-// 	This will be used to handle incoming survey results. 
-// 	This route will also be used to handle the compatibility logic.
-
-//These routes for our data. Help determine data user sees and data can post
-
-
-
 var friendsData = require('../data/friends.js');
+var path = require('path');
 
-module.exports = function (app) {
-    app.get('/api/friends', function (req, res) {
-        res.json(friendsData);
-    });
+// API GET Requests - when users "visit" a page. 
+// (ex:localhost:PORT/api/admin...they are shown a JSON of the data in the table) 
 
+var totalDifference = 0;
 
-    app.post('/api/friends', function (req, res) {
-        // if(friendsData.length<5) {
-        friendsData.push(req.body);
-        res.json(true);
-        // }
-    });
+module.exports = function(app){
+	app.get('/api/friends', function(req, res){
+		res.json(friendsData);
+	});
 
-}
-
-
+//API POST Request-handles when user submits a form & thus submits data to the server.
+// In each of the below cases, when a user submits form data (a JSON object)
+// ...the JSON is pushed to the appropriate Javascript array
 
 
+	app.post('/api/friends', function(req, res){
 
-//  var friends = require("../data/friends.js");
+		var greatMatch = {
+			name: "",
+			image: "",
+			matchDifference: 1000
+		};
+		var usrData 	= req.body;
+		var usrName 	= usrData.name;
+		var usrImage 	= usrData.image;
+		var usrScores 	= usrData.scores;
 
-// module.exports = function (app) {
+		var totalDifference = 0;
 
-//     app.get("/api/friends", function (req, res) {
-//         res.json(friends);
-//     });
+		//loop through the friends data array of objects to get each friends scores
+		for(var i = 0; i < [friendsData].length-1; i++){
+			console.log(friendsData[i].name);
+			totalDifference = 0;
 
-//     app.post("/api/friends", function (req, res) {
+			//loop through that friends score and the users score and calculate the 
+			// absolute difference between the two and push that to the total difference variable set above
+			for(var j = 0; j < 10; j++){
+				// We calculate the difference between the scores and sum them into the totalDifference
+				totalDifference += Math.abs(parseInt(usrScores[j]) - parseInt(friendsData[i].scores[j]));
+				// If the sum of differences is less then the differences of the current "best match"
+				if (totalDifference <= greatMatch.friendDifference){
 
-//         var bestMatch = {
-//             name: "",
-//             photo: "",
-//             friendDifference: 1000
-//         };
+					// Reset the bestMatch to be the new friend. 
+					greatMatch.name = friendsData[i].name;
+					greatMatch.photo = friendsData[i].photo;
+					greatMatch.matchDifference = totalDifference;
+				}
+			}
+		}
 
-//         console.log(req.body);
-
-//         var userData = req.body;
-//         var userScores = userData.scores;
-
-//         console.log(userScores);
-
-//         var totalDifference = 0;
-
-//         for (var i = 0; i < friends.length; i++) {
-//             console.log(friends[i]);
-//             totalDifference = 0;
-
-//             for (var i = 0; i < friends[i].scores[i]; i++) {
-//                 totalDifference += Math.abs(parseInt(userScores[i]) - parseInt(friends[i].scores[i]));
-//                 if (totalDifference <= bestMatch.friendDifference) {
-//                     bestMatch.name = friends[i].name;
-//                     bestMatch.photo = friends[i].photo;
-//                     bestMatch.friendDifference = friends[i].totalDifference;
-//                 }
-
-//             }
-
-//         }
-
-//         friends.push(userData);
-//         res.json(bestMatch);
-//     });
-
-// } 
+		friendsData.push(usrData);
+ 
+		res.json(greatMatch);
+	});
+};
